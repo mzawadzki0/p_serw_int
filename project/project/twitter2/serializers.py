@@ -27,16 +27,14 @@ class LikeDislikeSerializer(serializers.ModelSerializer):
         fields = ['post_id', 'user_id', 'time', 'like_dislike']
 
 
-class CommentSerializer(serializers.ModelSerializer):
+class ParentCommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Comment
-        fields = ['id', 'post_id', 'user_id', 'created_time', 'modified_time', 'content', 'is_reply_to']
+        fields = ['post_id']
 
 
-class ChildCommentSerializer(serializers.ModelSerializer):
-    is_reply_to = serializers.PrimaryKeyRelatedField(read_only=True)
-    parent_comment = CommentSerializer()
-
+class CommentSerializer(serializers.ModelSerializer):
+    is_reply_to = ParentCommentSerializer()
     class Meta:
         model = models.Comment
         fields = ['id',
@@ -45,13 +43,13 @@ class ChildCommentSerializer(serializers.ModelSerializer):
                   'created_time',
                   'modified_time',
                   'content',
-                  'is_reply_to',
-                  'parent_comment']
+                  'is_reply_to']
 
     def validate(self, data):
         if data['is_reply_to'] is not None:
-            if data['is_reply_to'] != data['parent_comment']['post_id']:
+            if data['post_id'] != data['is_reply_to']['post_id']:
                 raise serializers.ValidationError('Parent comment belongs to a different post')
+        return data
 
 
 class LikeDislikeCommentSerializer(serializers.ModelSerializer):
