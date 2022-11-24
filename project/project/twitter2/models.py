@@ -44,7 +44,7 @@ class Comment(models.Model):
     created_time = models.DateTimeField(auto_now_add=True)
     modified_time = models.DateTimeField(auto_now=True)
     content = models.CharField(max_length=300)
-    is_reply_to = models.ForeignKey('Comment', on_delete=models.SET_NULL, null=True, default=None, blank=True)
+    is_reply_to = models.ForeignKey('Comment', on_delete=models.SET_NULL, null=True, default='', blank=True)
 
 class LikeDislikeComment(models.Model):
     class LikeDisl(models.TextChoices):
