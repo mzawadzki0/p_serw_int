@@ -1,19 +1,27 @@
 from rest_framework import serializers
 from . import models
+import django.contrib.auth.password_validation as pw_validation
 
 
-class PublicUserSerializer(serializers.HyperlinkedModelSerializer):
+class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = models.User
         fields = ['username', 'created_time']
         read_only_fields = ['username', 'created_time']
 
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+class PrivateUserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = models.User
         fields = ['email', 'username', 'password', 'created_time']
         read_only_fields = ['created_time']
+
+    def validate(self, data):
+        try:
+            pw_validation.validate_password(data['password'])
+        except pw_validation.ValidationError as exception:
+            raise exception
+        return data
 
 
 class FollowingSerializer(serializers.HyperlinkedModelSerializer):

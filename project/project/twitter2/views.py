@@ -1,9 +1,14 @@
 from django.shortcuts import render
-from rest_framework import generics
+from rest_framework import generics, permissions
 from django.http import HttpResponse
 from .models import *
 from .serializers import *
+from .custompermission import *
 from django_filters import AllValuesFilter, DateTimeFilter, NumberFilter, FilterSet
+
+
+def index(request):
+    return HttpResponse('<h3>index page</h3>')
 
 
 class UserFilter(FilterSet):
@@ -18,17 +23,23 @@ class UserFilter(FilterSet):
 
 class UserList(generics.ListAPIView):
     queryset = User.objects.all()
-    serializer_class = PublicUserSerializer
+    serializer_class = UserSerializer
     name = 'user-list'
     search_fields = ['^username']
     ordering_fields = ['created_time']
     filter_class = UserFilter
 
 
-class UserDetail(generics.RetrieveUpdateAPIView):
+class UserEdit(generics.RetrieveUpdateAPIView):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
-    name = 'user-detail'
+    serializer_class = PrivateUserSerializer
+    name = 'user-edit'
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsCurrentUserOwner)
+
+
+class UserCreate(generics.CreateAPIView):
+    serializer_class = PrivateUserSerializer
+    name= 'user-create'
 
 
 class PostFilter(FilterSet):
@@ -57,9 +68,17 @@ class PostList(generics.ListAPIView):
     ordering_fields = ['created_time']
 
 
+
 class PostCreate(generics.CreateAPIView):
     serializer_class = PostSerializer
     name = 'post-create'
+    permission_classes = permissions.IsAuthenticatedOrReadOnly
+
+
+class PostEdit(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = PostSerializer
+    name = 'post-edit'
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsCurrentUserOwner)
 
 
 class CommentFilter(FilterSet):
@@ -90,3 +109,11 @@ class CommentList(generics.ListAPIView):
 
 class CommentCreate(generics.CreateAPIView):
     serializer_class = CommentSerializer
+    name = 'comment-create'
+    permission_classes = permissions.IsAuthenticatedOrReadOnly
+
+
+class CommentEdit(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = CommentSerializer
+    name = 'comment-edit'
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsCurrentUserOwner)

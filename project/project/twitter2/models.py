@@ -3,7 +3,7 @@ from django.db import models
 
 # Create your models here.
 class User(models.Model):
-    email = models.EmailField(max_length=254)
+    email = models.EmailField(max_length=254, unique=True)
     username = models.CharField(max_length=40)
     password = models.CharField(max_length=60)
     created_time = models.DateTimeField(auto_now_add=True)
@@ -37,6 +37,7 @@ class Post(models.Model):
     content = models.CharField(max_length=500)
     is_reply_to = models.ForeignKey('Post', on_delete=models.SET_NULL, null=True, default=None, blank=True)
     visibility = models.CharField(max_length=1, choices=PostVisibility.choices, default=PostVisibility.PUBLIC)
+
 
     class Meta:
         ordering = ('created_time',)
