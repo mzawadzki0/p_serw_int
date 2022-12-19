@@ -30,6 +30,12 @@ class UserList(generics.ListAPIView):
     filter_class = UserFilter
 
 
+class UserDetail(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    name = 'user-detail'
+
+
 class UserEdit(generics.RetrieveUpdateAPIView):
     queryset = User.objects.all()
     serializer_class = PrivateUserSerializer
@@ -75,7 +81,14 @@ class PostCreate(generics.CreateAPIView):
     permission_classes = permissions.IsAuthenticatedOrReadOnly
 
 
+class PostDetail(generics.RetrieveAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    name = 'post-detail'
+
+
 class PostEdit(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Post.objects.all()
     serializer_class = PostSerializer
     name = 'post-edit'
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsCurrentUserOwner)
@@ -111,6 +124,12 @@ class CommentCreate(generics.CreateAPIView):
     serializer_class = CommentSerializer
     name = 'comment-create'
     permission_classes = permissions.IsAuthenticatedOrReadOnly
+
+
+class CommentDetail(generics.RetrieveAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    name = 'comment-detail'
 
 
 class CommentEdit(generics.RetrieveUpdateDestroyAPIView):
