@@ -41,12 +41,12 @@ class ParentPostSerializer(serializers.HyperlinkedModelSerializer):
 
 class PostSerializer(serializers.HyperlinkedModelSerializer):
     is_reply_to = ParentPostSerializer()
-
+    user = serializers.SlugRelatedField(queryset=models.User.objects.all(), slug_field='username')
     class Meta:
         model = models.Post
-        fields = ['id', 'user_id', 'created_time', 'title', 'modified_time', 'title', 'content', 'is_reply_to',
+        fields = ['id', 'user', 'created_time', 'title', 'modified_time', 'title', 'content', 'is_reply_to',
                   'visibility']
-        read_only_fields = ['id', 'created_time', 'modified_time']
+        read_only_fields = ['id', 'user', 'created_time', 'modified_time']
 
     def validate(self, data):
         if data['is_reply_to'] is not None:

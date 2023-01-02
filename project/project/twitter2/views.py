@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from rest_framework import generics, permissions
+from rest_framework.response import Response
+from rest_framework.reverse import reverse
 from django.http import HttpResponse
 from .models import *
 from .serializers import *
@@ -9,6 +11,12 @@ from django_filters import AllValuesFilter, DateTimeFilter, NumberFilter, Filter
 
 def index(request):
     return HttpResponse('<h3>index page</h3>')
+
+
+class ApiRoot(generics.GenericAPIView):
+    name = 'api-root'
+    def get(self, request, *args, **kwargs):
+        return Response({'posts': reverse(PostList.name, request=request)})
 
 
 class UserFilter(FilterSet):
