@@ -7,10 +7,11 @@ from .models import *
 from .serializers import *
 from .custompermission import *
 from django_filters import AllValuesFilter, DateTimeFilter, NumberFilter, FilterSet
+from django.contrib.auth.models import User
 
 
 def index(request):
-    return HttpResponse('<h3>index page</h3>')
+    return HttpResponse('<h3>index page</h3><ul><li><a href="users">users</a></li><li><a href="posts">posts</a></li><li><a href="comments">comments</a></li></ul>')
 
 
 class ApiRoot(generics.GenericAPIView):
@@ -19,23 +20,12 @@ class ApiRoot(generics.GenericAPIView):
         return Response({'posts': reverse(PostList.name, request=request)})
 
 
-class UserFilter(FilterSet):
-    time_from = DateTimeFilter(field_name='time-from', lookup_type='gte')
-    time_to = DateTimeFilter(field_name='time-to', lookup_type='lte')
-
-    class Meta:
-        model = User
-        fields=['time_from', 'time_to']
-
-
-
 class UserList(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     name = 'user-list'
     search_fields = ['^username']
     ordering_fields = ['created_time']
-    filter_class = UserFilter
 
 
 class UserDetail(generics.RetrieveAPIView):
@@ -86,7 +76,7 @@ class PostList(generics.ListAPIView):
 class PostCreate(generics.CreateAPIView):
     serializer_class = PostSerializer
     name = 'post-create'
-    permission_classes = permissions.IsAuthenticatedOrReadOnly
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
 
 class PostDetail(generics.RetrieveAPIView):
