@@ -4,17 +4,15 @@ from . import views
 
 
 urlpatterns = [
-    path('users', views.UserList.as_view()),
-    path('users/create', views.UserCreate.as_view()),
-    path('users/view/<int:pk>', views.UserDetail.as_view()),
-    path('users/edit/<int:pk>', views.UserEdit.as_view()),
-    path('posts', views.PostList.as_view()),
-    path('posts/create', views.PostCreate.as_view()),
-    path('posts/<int:pk>', views.PostDetail.as_view()),
-    path('posts/<int:pk>/edit', views.PostEdit.as_view()),
-    path('comments', views.CommentList.as_view()),
-    path('comments/create', views.CommentCreate.as_view()),
-    path('comments/<int:pk>', views.CommentDetail.as_view()),
-    path('comments/<int:pk>/edit', views.CommentEdit.as_view()),
+    path('users', views.UserList.as_view(), name=views.UserList.name),
+    path('users/create', views.UserCreate.as_view(), name=views.UserCreate.name),
+    path('users/<int:pk>', views.UserDetail.as_view(), name=views.UserDetail.name),
+    path('users/edit/<int:pk>', views.UserEdit.as_view(), name=views.UserEdit.name),
+    path('posts', views.PostList.as_view(), name=views.PostList.name),
+    path('posts/<int:pk>', views.PostDetail.as_view(), name=views.PostDetail.name),
+    path('posts/<int:pk>/edit', views.PostEdit.as_view(), name=views.PostEdit.name),
+    path('comments', views.CommentList.as_view(), name=views.CommentList.name),
+    path('comments/<int:pk>', views.CommentDetail.as_view(), name=views.CommentDetail.name),
+    path('comments/<int:pk>/edit', views.CommentEdit.as_view(), name=views.CommentEdit.name),
     path('', views.index, name='index'),
 ]
