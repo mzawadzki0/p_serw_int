@@ -18,19 +18,20 @@ class Post(models.Model):
         PUBLIC = 'P'
         FOLLOWERS = 'F'
 
-    user_id = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
     created_time = models.DateTimeField(auto_now_add=True)
     modified_time = models.DateTimeField(auto_now=True)
     title = models.CharField(max_length=80)
     content = models.CharField(max_length=500)
     visibility = models.CharField(max_length=1, choices=PostVisibility.choices, default=PostVisibility.PUBLIC)
+    is_reply_to = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, default=None, related_name='child_posts')
 
 
     class Meta:
         ordering = ('created_time',)
 
     def __str__(self):
-        return self.created_time + '\n' + self.title + '\n' + self.content
+        return str(self.created_time) + '\n' + self.title + '\n' + self.content
 
 
 class LikeDislike(models.Model):
@@ -38,8 +39,8 @@ class LikeDislike(models.Model):
         LIKE = 'L'
         DISLIKE = 'D'
 
-    post_id = models.OneToOneField(Post, on_delete=models.CASCADE, primary_key=True)
-    user_id = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    post = models.OneToOneField(Post, on_delete=models.CASCADE, primary_key=True)
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
     time = models.DateTimeField(auto_now_add=True)
     like_dislike = models.CharField(max_length=1, choices=LikeDisl.choices, default=LikeDisl.LIKE)
 
@@ -48,11 +49,12 @@ class LikeDislike(models.Model):
 
 
 class Comment(models.Model):
-    post_id = models.ForeignKey(Post, on_delete=models.CASCADE)
-    user_id = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
     created_time = models.DateTimeField(auto_now_add=True)
     modified_time = models.DateTimeField(auto_now=True)
     content = models.CharField(max_length=300)
+    is_reply_to = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='child_comments')
 
     class Meta:
         ordering = ('created_time',)
@@ -66,8 +68,8 @@ class LikeDislikeComment(models.Model):
         LIKE = 'L'
         DISLIKE = 'D'
 
-    post_id = models.OneToOneField(Comment, on_delete=models.CASCADE, primary_key=True)
-    user_id = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    post = models.OneToOneField(Comment, on_delete=models.CASCADE, primary_key=True)
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
     time = models.DateTimeField(auto_now_add=True)
     like_dislike = models.CharField(max_length=1, choices=LikeDisl.choices, default=LikeDisl.LIKE)
 
