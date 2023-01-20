@@ -8,6 +8,7 @@ from .serializers import *
 from .custompermission import *
 from django_filters import AllValuesFilter, DateTimeFilter, NumberFilter, FilterSet
 from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 
 
 def index(request):
@@ -20,12 +21,24 @@ class ApiRoot(generics.GenericAPIView):
         return Response({'posts': reverse(PostList.name, request=request)})
 
 
+class UserFilter(FilterSet):
+    time_from = DateTimeFilter(field_name='date_joined', lookup_type='gte')
+    time_to = DateTimeFilter(field_name='date_joined', lookup_type='lte')
+
+    class Meta:
+        model = get_user_model()
+        fields=['time_from', 'time_to']
+
+
 class UserList(generics.ListAPIView):
-    queryset = User.objects.all()
+    Users = get_user_model()
+    queryset = Users.objects.all()
     serializer_class = UserSerializer
     name = 'user-list'
     search_fields = ['^username']
-    ordering_fields = ['created_time']
+    filter_class = UserFilter
+    ordering_fields = ['time_joined']
+
 
 
 class UserDetail(generics.RetrieveAPIView):
@@ -51,11 +64,11 @@ class PostFilter(FilterSet):
     created_time_to = DateTimeFilter(field_name='created_time', lookup_type='lte')
     modified_time_from = DateTimeFilter(field_name='modified_time', lookup_type='gte')
     modified_time_to = DateTimeFilter(field_name='modified_time', lookup_type='lte')
-    user_name = AllValuesFilter(field_name='user_id__username')
+    user = AllValuesFilter(field_name='user')
     is_reply_to = AllValuesFilter(field_name='is_reply_to')
     class Meta:
-        model = User
-        fields=['username',
+        model = Post
+        fields=['user',
                 'created_time_from',
                 'created_time_to',
                 'modified_time_from',
@@ -63,19 +76,13 @@ class PostFilter(FilterSet):
                 'is_reply_to']
 
 
-class PostList(generics.ListAPIView):
+class PostList(generics.ListCreateAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     name = 'post-list'
-    search_fields = ['title', 'content']
+    search_fields = ['^user', 'title', 'content']
     filter_class = PostFilter
     ordering_fields = ['created_time']
-
-
-
-class PostCreate(generics.CreateAPIView):
-    serializer_class = PostSerializer
-    name = 'post-create'
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
 
@@ -97,11 +104,11 @@ class CommentFilter(FilterSet):
     created_time_to = DateTimeFilter(field_name='created_time', lookup_type='lte')
     modified_time_from = DateTimeFilter(field_name='modified_time', lookup_type='gte')
     modified_time_to = DateTimeFilter(field_name='modified_time', lookup_type='lte')
-    post_id = AllValuesFilter(field_name='post_id')
+    post = AllValuesFilter(field_name='post')
     is_reply_to = AllValuesFilter(field_name='is_reply_to')
     class Meta:
-        model = User
-        fields=['post_id',
+        model = Comment
+        fields=['post',
                 'created_time_from',
                 'created_time_to',
                 'modified_time_from',
@@ -109,19 +116,14 @@ class CommentFilter(FilterSet):
                 'is_reply_to']
 
 
-class CommentList(generics.ListAPIView):
+class CommentList(generics.ListCreateAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     name = 'comment-list'
-    search_fields = ['^username', 'content']
+    search_fields = ['^user', 'content']
     filter_class = CommentFilter
     ordering_fields = ['created_time']
-
-
-class CommentCreate(generics.CreateAPIView):
-    serializer_class = CommentSerializer
-    name = 'comment-create'
-    permission_classes = permissions.IsAuthenticatedOrReadOnly
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
 
 class CommentDetail(generics.RetrieveAPIView):
