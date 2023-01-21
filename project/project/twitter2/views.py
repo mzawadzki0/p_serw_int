@@ -69,7 +69,7 @@ class FollowDetail(generics.RetrieveDestroyAPIView):
     queryset = Following.objects.all()
     serializer_class = FollowSerializer
     name = 'follow-detail'
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsCurrentUserOwner)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsCurrentUserOwnerOrReadOnly)
 
 
 class PostFilter(FilterSet):

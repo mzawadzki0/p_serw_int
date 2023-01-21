@@ -5,10 +5,12 @@ from django.contrib.auth.models import User
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
+    following = serializers.HyperlinkedRelatedField(queryset=models.Following.objects.all(), many=True, view_name='follow-detail')
+    followers = serializers.HyperlinkedRelatedField(many=True, read_only=True, view_name='follow-detail')
     class Meta:
         model = User
-        fields = ['pk', 'username', 'date_joined']
-        read_only_fields = ['pk', 'username', 'date_joined']
+        fields = ['pk', 'username', 'date_joined', 'following', 'followers']
+        read_only_fields = ['pk', 'username', 'date_joined', 'following', 'followers']
 
 
 class PrivateUserSerializer(serializers.HyperlinkedModelSerializer):
@@ -38,14 +40,15 @@ class PrivateUserSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class FollowSerializer(serializers.HyperlinkedModelSerializer):
+    user = serializers.SlugRelatedField(slug_field='username', read_only=True)
     class Meta:
         model = models.Following
-        fields = ['user_follower', 'user_followed', 'time']
+        fields = ['user', 'user_followed', 'time']
         read_only_fields = ['time', 'user_follower']
 
     def create(self, validated_data):
         follow_create = models.Following(
-            user_follower=self.context['request'].user,
+            user=self.context['request'].user,
             user_followed=validated_data['user_followed']
         )
         follow_create.save()

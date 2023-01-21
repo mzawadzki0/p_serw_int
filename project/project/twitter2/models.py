@@ -4,8 +4,8 @@ from django.db import models
 # Create your models here.
 
 class Following(models.Model):
-    user = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='followers')
-    user_followed = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='following')
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='following')
+    user_followed = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='followers')
     time = models.DateTimeField(auto_now_add=True)
 
     class Meta:
