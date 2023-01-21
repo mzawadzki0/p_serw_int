@@ -10,8 +10,12 @@ urlpatterns = [
     path('users/<int:pk>/edit', views.UserEdit.as_view(), name=views.UserEdit.name),
     path('posts', views.PostList.as_view(), name=views.PostList.name),
     path('posts/<int:pk>', views.PostDetail.as_view(), name=views.PostDetail.name),
+    path('posts/react', views.LikeDislikeNew.as_view(), name=views.LikeDislikeNew.name),
+    path('posts/react/<int:pk>', views.LikeDislikeDetail.as_view(), name=views.LikeDislikeDetail.name),
     path('comments', views.CommentList.as_view(), name=views.CommentList.name),
     path('comments/<int:pk>', views.CommentDetail.as_view(), name=views.CommentDetail.name),
+    path('comments/react', views.LikeDislikeCommentNew.as_view(), name=views.LikeDislikeCommentNew.name),
+    path('comments/react/<int:pk>', views.LikeDislikeCommentDetail.as_view(), name=views.LikeDislikeCommentDetail.name),
     path('index', views.index, name='index'),
     path('', views.ApiRoot.as_view())
 ]

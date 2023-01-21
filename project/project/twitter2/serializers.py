@@ -37,7 +37,6 @@ class PrivateUserSerializer(serializers.HyperlinkedModelSerializer):
         return data
 
 
-
 class FollowingSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
@@ -46,15 +45,92 @@ class FollowingSerializer(serializers.HyperlinkedModelSerializer):
         read_only_fields = ['time']
 
 
+class LikeDislikeCommentSerializer(serializers.HyperlinkedModelSerializer):
+    comment = serializers.HyperlinkedRelatedField(view_name='comment-detail', queryset=models.Comment.objects.all())
+    class Meta:
+        model = models.LikeDislikeComment
+        fields = ['comment', 'user', 'time', 'like_dislike']
+        read_only_fields = ['time', 'user']
+
+    def create(self, validated_data):
+        reaction_create = models.LikeDislikeComment(
+            comment=validated_data['comment'],
+            user=self.context['request'].user,
+            like_dislike=validated_data['like_dislike'],
+        )
+        reaction_create.save()
+        return reaction_create
+
+
+class CommentSerializer(serializers.HyperlinkedModelSerializer):
+    user = serializers.SlugRelatedField(slug_field='username', read_only=True)
+    is_reply_to = serializers.PrimaryKeyRelatedField(queryset=models.Comment.objects.all(), allow_null=True)
+    comment_reactions = serializers.StringRelatedField(read_only=True, many=True)
+
+    class Meta:
+        model = models.Comment
+        fields = ['id',
+                  'post',
+                  'user',
+                  'created_time',
+                  'modified_time',
+                  'content',
+                  'is_reply_to',
+                  'child_comments',
+                  'comment_reactions']
+        read_only_fields = ['id', 'user', 'created_time', 'modified_time', 'child_comments', 'comment_reactions']
+
+    def create(self, validated_data):
+        comment_create = models.Comment(
+            post=validated_data['post'],
+            user=self.context['request'].user,
+            content=validated_data['content'],
+            is_reply_to=validated_data['is_reply_to']
+        )
+        comment_create.save()
+        return comment_create
+
+    # Edytuj tylko treść
+    def update(self, instance, validated_data):
+        instance.content = validated_data['content']
+        instance.save()
+        return instance
+
+    def validate(self, data):
+        # Odpowiedź na komentarz pod postem innym niż ten, do którego należy self
+        if data['is_reply_to'] is not None:
+            if data['post'] != data['is_reply_to'].post:
+                raise serializers.ValidationError('Parent comment belongs to a different post')
+        return data
+
+
+class LikeDislikeSerializer(serializers.HyperlinkedModelSerializer):
+    post = serializers.HyperlinkedRelatedField(view_name='post-detail', queryset=models.Post.objects.all())
+    class Meta:
+        model = models.LikeDislike
+        fields = ['post', 'user', 'time', 'like_dislike']
+        read_only_fields = ['post', 'user']
+
+    def create(self, validated_data):
+        reaction_create = models.LikeDislike(
+            post=validated_data['post'],
+            user=self.context['request'].user,
+            like_dislike=validated_data['like_dislike'],
+        )
+        reaction_create.save()
+        return reaction_create
+
+
 class PostSerializer(serializers.HyperlinkedModelSerializer):
     user = serializers.SlugRelatedField(slug_field='username', read_only=True)
-    comments = serializers.PrimaryKeyRelatedField(read_only=True)
+    comments = serializers.StringRelatedField(read_only=True, many=True)
+    post_reactions = serializers.StringRelatedField(read_only=True, many=True)
+
     class Meta:
         model = models.Post
-        fields = [ 'id', 'user', 'created_time', 'title', 'modified_time', 'content',
-                  'visibility', 'is_reply_to', 'child_posts', 'comments']
-        read_only_fields = ['id', 'user' 'created_time', 'modified_time', 'child_posts', 'comments']
-        
+        fields = ['id', 'user', 'created_time', 'title', 'modified_time', 'content', 'visibility', 'is_reply_to',
+                  'child_posts', 'comments', 'post_reactions']
+        read_only_fields = ['id', 'user' 'created_time', 'modified_time', 'child_posts', 'comments', 'post_reactions']
 
     def create(self, validated_data):
         post_create = models.Post(
@@ -67,56 +143,10 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
         post_create.save()
         return post_create
 
+    # Edytuj tylko tytuł, treść i widoczność
     def update(self, instance, validated_data):
-        instance = models.Post(
-            title=validated_data['title'],
-            content=validated_data['content'],
-            visibility=validated_data['visibility']
-        )
+        instance.title = validated_data['title']
+        instance.content = validated_data['content']
+        instance.visibility = validated_data['visibility']
         instance.save()
         return instance
-
-
-class LikeDislikeSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = models.LikeDislike
-        fields = ['post_id', 'user_id', 'time', 'like_dislike']
-        read_only_fields = ['like_dislike']
-
-
-class CommentSerializer(serializers.HyperlinkedModelSerializer):
-    user = serializers.SlugRelatedField(slug_field='username', read_only=True)
-
-    class Meta:
-        model = models.Comment
-        fields = ['id',
-                  'post',
-                  'user',
-                  'created_time',
-                  'modified_time',
-                  'content',
-                  'is_reply_to',
-                  'child_comments']
-        read_only_fields = ['id', 'user', 'created_time', 'modified_time', 'child_comments']
-
-    def create(self, validated_data):
-        comment_create = models.Comment(
-            post=validated_data['post'],
-            user=self.context['request'].user,
-            content=validated_data['content'],
-            is_reply_to=validated_data['is_reply_to']
-        )
-        comment_create.save()
-        return comment_create
-
-    def validate(self, data):
-        if data['is_reply_to'] is not None:
-            if data['post'] != data['is_reply_to']['post']:
-                raise serializers.ValidationError('Parent comment belongs to a different post')
-
-
-class LikeDislikeCommentSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = models.LikeDislikeComment
-        fields = ['post', 'user', 'time', 'like_dislike']
-        read_only_fields = ['time']

@@ -93,6 +93,20 @@ class PostDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsCurrentUserOwnerOrReadOnly)
 
 
+class LikeDislikeNew(generics.CreateAPIView):
+    queryset = LikeDislike.objects.all()
+    serializer_class = LikeDislikeSerializer
+    name = 'react'
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+
+class LikeDislikeDetail(generics.RetrieveDestroyAPIView):
+    queryset = LikeDislike.objects.all()
+    serializer_class = LikeDislikeSerializer
+    name = 'react-detail'
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsCurrentUserOwnerOrReadOnly)
+
+
 class CommentFilter(FilterSet):
     created_time_from = DateTimeFilter(field_name='created_time', lookup_type='gte')
     created_time_to = DateTimeFilter(field_name='created_time', lookup_type='lte')
@@ -124,4 +138,20 @@ class CommentDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     name = 'comment-detail'
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsCurrentUserOwner)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsCurrentUserOwnerOrReadOnly)
+
+
+
+
+class LikeDislikeCommentNew(generics.CreateAPIView):
+    queryset = LikeDislikeComment.objects.all()
+    serializer_class = LikeDislikeCommentSerializer
+    name = 'react-comment'
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+
+class LikeDislikeCommentDetail(generics.RetrieveDestroyAPIView):
+    queryset = LikeDislikeComment
+    serializer_class = LikeDislikeCommentSerializer
+    name = 'react-comment-detail'
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsCurrentUserOwnerOrReadOnly)
