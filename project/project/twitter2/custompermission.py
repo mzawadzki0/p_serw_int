@@ -9,6 +9,7 @@ class IsCurrentUserOwnerOrReadOnly(permissions.BasePermission):
             return obj.user == request.user
 
 
+# Edycja profilu użytkownika
 class IsCurrentUserOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        return obj.user == request.user
+        return obj == request.user
