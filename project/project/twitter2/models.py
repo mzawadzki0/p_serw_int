@@ -31,7 +31,7 @@ class Post(models.Model):
         ordering = ('created_time',)
 
     def __str__(self):
-        return str(self.created_time) + '\n' + self.title + '\n' + self.content
+        return str(self.created_time) + '\n' + self.user.username + '\n' + self.title + '\n' + self.content
 
 
 class LikeDislike(models.Model):
@@ -60,7 +60,7 @@ class Comment(models.Model):
         ordering = ('created_time',)
 
     def __str__(self):
-        return self.created_time + '\n' + self.content
+        return str(self.created_time) + '\n' + self.user.username + '\n' + self.content
 
 
 class LikeDislikeComment(models.Model):

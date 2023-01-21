@@ -86,17 +86,11 @@ class PostList(generics.ListCreateAPIView):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
 
-class PostDetail(generics.RetrieveAPIView):
+class PostDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     name = 'post-detail'
-
-
-class PostEdit(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Post.objects.all()
-    serializer_class = PostSerializer
-    name = 'post-edit'
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsCurrentUserOwner)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsCurrentUserOwnerOrReadOnly)
 
 
 class CommentFilter(FilterSet):
@@ -126,13 +120,8 @@ class CommentList(generics.ListCreateAPIView):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
 
-class CommentDetail(generics.RetrieveAPIView):
+class CommentDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     name = 'comment-detail'
-
-
-class CommentEdit(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = CommentSerializer
-    name = 'comment-edit'
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsCurrentUserOwner)
