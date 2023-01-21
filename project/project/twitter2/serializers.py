@@ -40,14 +40,21 @@ class PrivateUserSerializer(serializers.HyperlinkedModelSerializer):
 class FollowSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = models.Following
-        fields = ['user_id_follower', 'user_id_followed', 'time']
-        read_only_fields = ['time', 'user_id_follower']
+        fields = ['user_follower', 'user_followed', 'time']
+        read_only_fields = ['time', 'user_follower']
 
     def create(self, validated_data):
         follow_create = models.Following(
-            user_id_follower=self.context['request'].user,
-            user_id_followed=validated_data['user_id_followed']
+            user_follower=self.context['request'].user,
+            user_followed=validated_data['user_followed']
         )
+        follow_create.save()
+        return follow_create
+
+    def validate(self, data):
+        if data['user_followed'] == self.context['request'].user:
+            raise serializers.ValidationError('User can\'t follow self')
+        return data
 
 
 class LikeDislikeCommentSerializer(serializers.HyperlinkedModelSerializer):

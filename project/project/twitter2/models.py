@@ -4,16 +4,16 @@ from django.db import models
 # Create your models here.
 
 class Following(models.Model):
-    user_follower = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='followers')
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='followers')
     user_followed = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='following')
     time = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering: ('time',)
-        unique_together = ('user_follower', 'user_followed')
+        unique_together = ('user', 'user_followed')
 
     def __str__(self):
-        return str(self.id) + ') ' + str(self.time)[0:19] + ', ' + self.user_follower.username + '->' + \
+        return str(self.id) + ') ' + str(self.time)[0:19] + ', ' + self.user.username + '->' + \
             self.user_followed.username
 
 
