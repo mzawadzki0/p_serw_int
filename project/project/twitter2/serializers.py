@@ -37,12 +37,17 @@ class PrivateUserSerializer(serializers.HyperlinkedModelSerializer):
         return data
 
 
-class FollowingSerializer(serializers.HyperlinkedModelSerializer):
-
+class FollowSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = models.Following
         fields = ['user_id_follower', 'user_id_followed', 'time']
-        read_only_fields = ['time']
+        read_only_fields = ['time', 'user_id_follower']
+
+    def create(self, validated_data):
+        follow_create = models.Following(
+            user_id_follower=self.context['request'].user,
+            user_id_followed=validated_data['user_id_followed']
+        )
 
 
 class LikeDislikeCommentSerializer(serializers.HyperlinkedModelSerializer):
@@ -56,7 +61,7 @@ class LikeDislikeCommentSerializer(serializers.HyperlinkedModelSerializer):
         reaction_create = models.LikeDislikeComment(
             comment=validated_data['comment'],
             user=self.context['request'].user,
-            like_dislike=validated_data['like_dislike'],
+            like_dislike=validated_data['like_dislike']
         )
         reaction_create.save()
         return reaction_create
@@ -115,7 +120,7 @@ class LikeDislikeSerializer(serializers.HyperlinkedModelSerializer):
         reaction_create = models.LikeDislike(
             post=validated_data['post'],
             user=self.context['request'].user,
-            like_dislike=validated_data['like_dislike'],
+            like_dislike=validated_data['like_dislike']
         )
         reaction_create.save()
         return reaction_create

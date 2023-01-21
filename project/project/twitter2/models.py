@@ -4,13 +4,17 @@ from django.db import models
 # Create your models here.
 
 class Following(models.Model):
-    user_id_follower = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='followers')
-    user_id_followed = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='following')
+    user_follower = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='followers')
+    user_followed = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='following')
     time = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering: ('time',)
-        unique_together = ('user_id_follower', 'user_id_followed')
+        unique_together = ('user_follower', 'user_followed')
+
+    def __str__(self):
+        return str(self.id) + ') ' + str(self.time)[0:19] + ', ' + self.user_follower.username + '->' + \
+            self.user_followed.username
 
 
 class Post(models.Model):
@@ -41,7 +45,7 @@ class LikeDislike(models.Model):
 
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='post_reactions')
     user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
-    time = models.DateTimeField(auto_now=True)
+    time = models.DateTimeField(auto_now_add=True)
     like_dislike = models.CharField(max_length=1, choices=LikeDisl.choices, default=LikeDisl.LIKE)
 
     class Meta:
@@ -74,7 +78,7 @@ class LikeDislikeComment(models.Model):
 
     comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name='comment_reactions')
     user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
-    time = models.DateTimeField(auto_now=True)
+    time = models.DateTimeField(auto_now_add=True)
     like_dislike = models.CharField(max_length=1, choices=LikeDisl.choices, default=LikeDisl.LIKE)
 
     class Meta:
