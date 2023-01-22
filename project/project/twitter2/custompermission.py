@@ -13,3 +13,9 @@ class IsCurrentUserOwnerOrReadOnly(permissions.BasePermission):
 class IsCurrentUserOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         return obj == request.user
+
+
+# Tworzenie nowego użytkownika
+class IsAnonymousUser(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_anonymous

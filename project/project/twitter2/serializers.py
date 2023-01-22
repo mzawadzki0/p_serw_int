@@ -46,14 +46,6 @@ class FollowSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['user', 'user_followed', 'time']
         read_only_fields = ['time', 'user_follower']
 
-    def create(self, validated_data):
-        follow_create = models.Following(
-            user=self.context['request'].user,
-            user_followed=validated_data['user_followed']
-        )
-        follow_create.save()
-        return follow_create
-
     def validate(self, data):
         if data['user_followed'] == self.context['request'].user:
             raise serializers.ValidationError('User can\'t follow self')
@@ -66,15 +58,6 @@ class LikeDislikeCommentSerializer(serializers.HyperlinkedModelSerializer):
         model = models.LikeDislikeComment
         fields = ['comment', 'user', 'time', 'like_dislike']
         read_only_fields = ['time', 'user']
-
-    def create(self, validated_data):
-        reaction_create = models.LikeDislikeComment(
-            comment=validated_data['comment'],
-            user=self.context['request'].user,
-            like_dislike=validated_data['like_dislike']
-        )
-        reaction_create.save()
-        return reaction_create
 
 
 class CommentSerializer(serializers.HyperlinkedModelSerializer):
@@ -94,16 +77,6 @@ class CommentSerializer(serializers.HyperlinkedModelSerializer):
                   'child_comments',
                   'comment_reactions']
         read_only_fields = ['id', 'user', 'created_time', 'modified_time', 'child_comments', 'comment_reactions']
-
-    def create(self, validated_data):
-        comment_create = models.Comment(
-            post=validated_data['post'],
-            user=self.context['request'].user,
-            content=validated_data['content'],
-            is_reply_to=validated_data['is_reply_to']
-        )
-        comment_create.save()
-        return comment_create
 
     # Edytuj tylko treść
     def update(self, instance, validated_data):
@@ -126,15 +99,6 @@ class LikeDislikeSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['post', 'user', 'time', 'like_dislike']
         read_only_fields = ['post', 'user']
 
-    def create(self, validated_data):
-        reaction_create = models.LikeDislike(
-            post=validated_data['post'],
-            user=self.context['request'].user,
-            like_dislike=validated_data['like_dislike']
-        )
-        reaction_create.save()
-        return reaction_create
-
 
 class PostSerializer(serializers.HyperlinkedModelSerializer):
     user = serializers.SlugRelatedField(slug_field='username', read_only=True)
@@ -146,17 +110,6 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['id', 'user', 'created_time', 'modified_time', 'title', 'content', 'visibility', 'is_reply_to',
                   'child_posts', 'comments', 'post_reactions']
         read_only_fields = ['id', 'user' 'created_time', 'modified_time', 'child_posts', 'comments', 'post_reactions']
-
-    def create(self, validated_data):
-        post_create = models.Post(
-            user=self.context['request'].user,
-            title=validated_data['title'],
-            content=validated_data['content'],
-            visibility=validated_data['visibility'],
-            is_reply_to=validated_data['is_reply_to']
-        )
-        post_create.save()
-        return post_create
 
     # Edytuj tylko tytuł, treść i widoczność
     def update(self, instance, validated_data):

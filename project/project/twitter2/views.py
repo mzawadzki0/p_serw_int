@@ -19,9 +19,13 @@ class ApiRoot(generics.GenericAPIView):
     name = 'api-root'
     def get(self, request, *args, **kwargs):
         return Response({
+            'create user': reverse(UserCreate.name, request=request),
             'users': reverse(UserList.name, request=request),
             'posts': reverse(PostList.name, request=request),
-            'comments': reverse(CommentList.name, request=request)
+            'post reactions': reverse(LikeDislikeNew.name, request=request),
+            'comments': reverse(CommentList.name, request=request),
+            'comment reactions': reverse(LikeDislikeCommentNew.name, request=request),
+            'follow': reverse(FollowNew.name, request=request)
         })
 
 
@@ -61,12 +65,16 @@ class UserEdit(generics.RetrieveUpdateAPIView):
 class UserCreate(generics.CreateAPIView):
     serializer_class = PrivateUserSerializer
     name= 'user-create'
+    permission_classes = (IsAnonymousUser,)
 
 
-class FollowNew(generics.CreateAPIView):
+class FollowNew(generics.ListCreateAPIView):
     serializer_class = FollowSerializer
     name = 'follow'
     permission_classes = (permissions.IsAuthenticated,)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 
 class FollowDetail(generics.RetrieveDestroyAPIView):
@@ -102,6 +110,9 @@ class PostList(generics.ListCreateAPIView):
     ordering_fields = ['created_time']
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
 
 class PostDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Post.objects.all()
@@ -114,6 +125,9 @@ class LikeDislikeNew(generics.CreateAPIView):
     serializer_class = LikeDislikeSerializer
     name = 'react'
     permission_classes = (permissions.IsAuthenticated,)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 
 class LikeDislikeDetail(generics.RetrieveDestroyAPIView):
@@ -149,6 +163,9 @@ class CommentList(generics.ListCreateAPIView):
     ordering_fields = ['created_time']
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
 
 class CommentDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Comment.objects.all()
@@ -161,6 +178,9 @@ class LikeDislikeCommentNew(generics.CreateAPIView):
     serializer_class = LikeDislikeCommentSerializer
     name = 'react-comment'
     permission_classes = (permissions.IsAuthenticated,)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 
 class LikeDislikeCommentDetail(generics.RetrieveDestroyAPIView):
