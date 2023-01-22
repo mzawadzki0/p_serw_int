@@ -9,8 +9,8 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
     followers = serializers.HyperlinkedRelatedField(many=True, read_only=True, view_name='follow-detail')
     class Meta:
         model = User
-        fields = ['pk', 'username', 'date_joined', 'following', 'followers']
-        read_only_fields = ['pk', 'username', 'date_joined', 'following', 'followers']
+        fields = ['pk', 'username', 'date_joined', 'following', 'followers', 'posts']
+        read_only_fields = ['pk', 'username', 'date_joined', 'following', 'followers', 'posts']
 
 
 class PrivateUserSerializer(serializers.HyperlinkedModelSerializer):
@@ -143,7 +143,7 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = models.Post
-        fields = ['id', 'user', 'created_time', 'title', 'modified_time', 'content', 'visibility', 'is_reply_to',
+        fields = ['id', 'user', 'created_time', 'modified_time', 'title', 'content', 'visibility', 'is_reply_to',
                   'child_posts', 'comments', 'post_reactions']
         read_only_fields = ['id', 'user' 'created_time', 'modified_time', 'child_posts', 'comments', 'post_reactions']
 

@@ -18,7 +18,11 @@ def index(request):
 class ApiRoot(generics.GenericAPIView):
     name = 'api-root'
     def get(self, request, *args, **kwargs):
-        return Response({'posts': reverse(PostList.name, request=request)})
+        return Response({
+            'users': reverse(UserList.name, request=request),
+            'posts': reverse(PostList.name, request=request),
+            'comments': reverse(CommentList.name, request=request)
+        })
 
 
 class UserFilter(FilterSet):

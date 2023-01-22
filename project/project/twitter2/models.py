@@ -22,7 +22,7 @@ class Post(models.Model):
         PUBLIC = 'P'
         FOLLOWERS = 'F'
 
-    user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='posts')
     created_time = models.DateTimeField(auto_now_add=True)
     modified_time = models.DateTimeField(auto_now=True)
     title = models.CharField(max_length=80)
