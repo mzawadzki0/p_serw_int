@@ -68,7 +68,8 @@ class UserCreate(generics.CreateAPIView):
     permission_classes = (IsAnonymousUser,)
 
 
-class FollowNew(generics.ListCreateAPIView):
+class FollowNew(generics.CreateAPIView):
+    queryset = models.Following.objects.all()
     serializer_class = FollowSerializer
     name = 'follow'
     permission_classes = (permissions.IsAuthenticated,)
