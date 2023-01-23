@@ -55,7 +55,7 @@ class UserDetail(generics.RetrieveAPIView):
     name = 'user-detail'
 
 
-class UserEdit(generics.RetrieveUpdateAPIView):
+class UserEdit(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = PrivateUserSerializer
     name = 'user-edit'
